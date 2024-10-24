@@ -1,0 +1,31 @@
+# Rust compilation files
+/target/
+
+# If you're using Cargo's built-in package cache
+/.cargo/
+
+# If you use tests with coverage (like cargo-tarpaulin)
+/coverage/
+**/*.profraw
+
+# Binaries created by `cargo build`
+*.rs.bk
+*.exe
+*.dll
+*.so
+*.dylib
+*.pdb
+*.log
+
+# Debugging tool files
+*.log
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+/tarpaulin-report/

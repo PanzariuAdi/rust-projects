@@ -1,0 +1,8 @@
+[package]
+name = "challenge_01"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rand = "0.8.5"
+clap = { version = "4.0", features = ["derive"] }

@@ -1,0 +1,125 @@
+use std::{
+    collections::HashMap,
+    fs::File,
+    io::{BufRead, BufReader},
+};
+
+use priority_queue::PriorityQueue;
+
+#[derive(Debug)]
+struct Node {
+    pub letter: Option<Box<char>>,
+    pub occurences: usize,
+    pub is_leaf: bool,
+    pub left: Option<Box<Node>>,
+    pub right: Option<Box<Node>>,
+}
+
+impl Node {
+    fn new(letter: char, occurences: usize) -> Self {
+        Node {
+            letter: Some(Box::new(letter)),
+            occurences,
+            is_leaf: true,
+            left: None,
+            right: None,
+        }
+    }
+
+    fn new_node(occurences: usize, left_node: Node, right_node: Node) -> Self {
+        Node {
+            letter: None,
+            occurences,
+            is_leaf: false,
+            left: Some(Box::new(left_node)),
+            right: Some(Box::new(right_node)),
+        }
+    }
+
+    fn add_left(&mut self, node: Node) {
+        self.left = Some(Box::new(node));
+    }
+
+    fn add_right(&mut self, node: Node) {
+        self.right = Some(Box::new(node));
+    }
+
+    fn set_is_leaf(&mut self) {
+        self.is_leaf = true;
+    }
+}
+
+impl PartialEq for Node {
+    fn eq(&self, other: &Self) -> bool {
+        self.occurences == other.occurences
+            && self.letter == other.letter
+            && self.is_leaf == other.is_leaf
+    }
+}
+
+impl Eq for Node {}
+
+impl PartialOrd for Node {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+fn open_file(path: &str) -> Result<BufReader<File>, String> {
+    let file = File::open(path).map_err(|_| "Error at opening the file".to_string())?;
+
+    Ok(BufReader::new(file))
+}
+
+fn build_occurence_map(reader: Result<BufReader<File>, String>) -> HashMap<char, usize> {
+    let mut occurency_map: HashMap<char, usize> = HashMap::new();
+
+    reader.unwrap().lines().for_each(|line| match line {
+        Ok(line_str) => {
+            for ch in line_str.chars() {
+                occurency_map.insert(ch, occurency_map.get(&ch).unwrap_or(&0) + 1);
+            }
+        }
+        Err(_) => {
+            println!("Error at reading the line");
+        }
+    });
+
+    occurency_map
+}
+
+fn build_priority_queue(occurence_map: HashMap<char, usize>) -> PriorityQueue<char, usize> {
+    let mut pq: PriorityQueue<char, usize> = PriorityQueue::new();
+
+    for (key, appereances) in occurence_map.iter() {
+        let _ = pq.push(*key, *appereances);
+    }
+
+    pq
+}
+
+fn build_priority_queue_v2(occurence_map: HashMap<char, usize>) -> PriorityQueue<Node> {
+    let mut pq: PriorityQueue<Node> = PriorityQueue::new();
+
+    for (key, appereances) in occurence_map.iter() {
+        let _ = pq.push(*key, *appereances);
+    }
+
+    pq
+}
+
+fn create_huffman_tree(trees: PriorityQueue<char, usize>) -> Node {}
+
+fn main() {
+    let reader = open_file("test.txt");
+    let occurency_map = build_occurence_map(reader);
+    let mut pq = build_priority_queue(occurency_map);
+
+    let mut huffman_trees: Vec<Node> = Vec::new();
+
+    while pq.len() > 0 {
+        let (letter, occurences) = pq.pop().unwrap();
+        let current_node = Node::new(letter, occurences);
+        huffman_trees.push(current_node);
+    }
+}
